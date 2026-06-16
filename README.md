@@ -125,8 +125,7 @@ pip install flask opencv-python dlib numpy tensorflow werkzeug
 
 The trained model files are too large for GitHub (>100MB each). Download them and place them in the `models/` folder:
 
-> **📥 Model Download Link:** [Google Drive / OneDrive link here]
-
+> **📥 Model Download Link:**https://drive.google.com/drive/folders/1PLRYWGBN-fi8FlYnYEtZtqXmVvfbfB9o?usp=sharing
 | Model File | Size | Description |
 |-----------|------|-------------|
 | `deepfake-detection-model.h5` | ~654 MB | ResNet50 classification model |
