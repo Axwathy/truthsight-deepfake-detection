@@ -1,0 +1,19 @@
+# Large model files (exceed GitHub's 100MB limit)
+models/
+
+# Test videos (large files)
+test_videos/
+
+# macOS files
+__MACOSX/
+.DS_Store
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Uploads folder
+uploads/
+
+# Python cache
+__pycache__/
+*.pyc
