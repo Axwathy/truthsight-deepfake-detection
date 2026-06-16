@@ -1,6 +1,6 @@
 <div align="center">
 
-# ✨ TruthSight — AI-Powered Deepfake Video Detection ✨
+#  TruthSight — AI-Powered Deepfake Video Detection 
 
 </div>
 
@@ -25,7 +25,7 @@ TruthSight is an AI-powered web application that detects deepfake videos by anal
 
 Simply upload a video — TruthSight handles the rest.
 
-## ✨ Key Features
+## Key Features
 
 - 🧠 **Advanced Deep Learning**: Powered by ResNet50 architecture trained on deepfake datasets for unparalleled accuracy
 - 🖼️ **Frame Enhancement**: UNet-based model improves frame quality before analysis for better detection on low-quality videos
