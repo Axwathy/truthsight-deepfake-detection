@@ -125,11 +125,12 @@ pip install flask opencv-python dlib numpy tensorflow werkzeug
 
 The trained model files are too large for GitHub (>100MB each). Download them and place them in the `models/` folder:
 
-> **📥 Model Download Link:**https://drive.google.com/drive/folders/1PLRYWGBN-fi8FlYnYEtZtqXmVvfbfB9o?usp=sharing
+> **📥 Model Download Link:** [Click here to download models](https://drive.google.com/drive/folders/1PLRYWGBN-fi8FlYnYEtZtqXmVvfbfB9o?usp=sharing)
+
 | Model File | Size | Description |
 |-----------|------|-------------|
-| `deepfake-detection-model.h5` | ~654 MB | ResNet50 classification model |
-| `best_unet_model.keras` | ~373 MB | UNet frame enhancement model |
+| `deepfake-detection-model.h5` | ~654 MB | ResNet50-based binary classifier trained on the DFDC dataset to detect real vs fake faces |
+| `best_unet_model.keras` | ~373 MB | Retinex-guided UNet encoder-decoder model used to enhance and sharpen video frames before classification |
 
 ### 4. Run the Application
 
