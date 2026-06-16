@@ -1,6 +1,6 @@
 <div align="center">
 
-#  TruthSight — AI-Powered Deepfake Video Detection 
+# TruthSight — Deepfake Video Detection
 
 </div>
 
@@ -13,221 +13,182 @@
 ![License](https://img.shields.io/badge/License-Open--Source-green)
 ![AI](https://img.shields.io/badge/AI-Deep%20Learning-purple)
 
-**A powerful deepfake detection web application using ResNet50 and UNet deep learning models to identify AI-generated or manipulated video content with high accuracy.**
-
 </div>
 
 ---
 
-## 🚀 What is TruthSight?
+TruthSight is a web app I built to detect deepfake videos using deep learning. Upload a video, and it tells you whether it's real or fake — along with a confidence score.
 
-TruthSight is an AI-powered web application that detects deepfake videos by analyzing them frame-by-frame. It extracts faces from video frames, enhances image quality using a UNet model, and classifies each face as **REAL** or **FAKE** using a ResNet50 deep learning model. The final verdict is determined through majority voting across all analyzed frames, delivering results with confidence scoring.
+The core idea is a two-stage pipeline: first enhance the video frames to improve quality, then classify each face as real or fake using ResNet50. Final verdict is based on majority voting across all analyzed frames.
 
-Simply upload a video — TruthSight handles the rest.
+---
 
-## Key Features
+## How it works
 
-- 🧠 **Advanced Deep Learning**: Powered by ResNet50 architecture trained on deepfake datasets for unparalleled accuracy
-- 🖼️ **Frame Enhancement**: UNet-based model improves frame quality before analysis for better detection on low-quality videos
-- 👤 **Face Detection**: Dlib frontal face detector identifies and isolates all faces in each frame
-- 📤 **Drag & Drop Upload**: Simple and intuitive video upload interface
-- 📊 **Detailed Reports**: Confidence scores, frame-by-frame statistics, and visual prediction distribution
-- 🔒 **Privacy First**: Videos are processed securely and deleted immediately after analysis
-- 🎬 **Multi-Format Support**: Supports MP4, AVI, MOV, MKV, and WEBM formats (up to 500MB)
-- ⚡ **Fast Processing**: Optimized pipeline samples 1 frame per second for speed and accuracy balance
+1. You upload a video (MP4, AVI, MOV, MKV, or WEBM — up to 500MB)
+2. OpenCV pulls one frame per second from the video
+3. Each frame gets passed through a Retinex-guided UNet model to improve image quality
+4. Dlib's HOG-based face detector finds and crops faces from each frame
+5. ResNet50 classifies each face crop as Real or Fake
+6. Majority voting across all frames gives the final verdict + confidence %
 
-## 📋 How It Works
+The reason I added the enhancement step before classification is that low-light or compressed videos tend to hide manipulation artifacts. Running frames through the UNet first makes those artifacts more visible, which is why accuracy jumps from ~97% to 99.56% compared to skipping enhancement.
 
-1. 📤 **Upload** your video through the web interface (drag & drop or browse)
-2. 🎞️ **Frame Extraction** — System extracts 1 key frame per second from the video
-3. ✨ **Enhancement** — UNet model enhances each frame for better quality (256×256)
-4. 👤 **Face Detection** — Dlib detects all faces in each enhanced frame
-5. 🧠 **Classification** — ResNet50 model classifies each face as Real or Fake (224×224)
-6. 📊 **Result** — Majority voting determines the final verdict with confidence percentage
+---
 
-## 🛠️ Tech Stack
+## Results
 
-| Component | Technology |
-|-----------|------------|
+| Metric | Value |
+|--------|-------|
+| Test Accuracy | 99.56% |
+| Precision | 96.84% |
+| Recall | 97.65% |
+| F1-Score | 97.25% |
+
+**With vs without enhancement:**
+| | Accuracy | F1 |
+|--|--|--|
+| Without enhancement | 97.3% | 0.971 |
+| With enhancement | 99.56% | 0.995 |
+
+---
+
+## Models
+
+| Model | Architecture | Input | Trained On |
+|-------|-------------|-------|------------|
+| Classification | ResNet50 | 224×224 | DFDC (Deepfake Detection Challenge) |
+| Enhancement | Retinex UNet | 256×256 | LOL (Low-Light) dataset |
+| Face Detector | Dlib HOG | Variable | Built-in |
+
+### Download models
+
+The model files are too large for GitHub. Download and place them in the `models/` folder:
+
+> **📥 [Click here to download models](https://drive.google.com/drive/folders/1PLRYWGBN-fi8FlYnYEtZtqXmVvfbfB9o?usp=sharing)**
+
+| File | Size | Description |
+|------|------|-------------|
+| `deepfake-detection-model.h5` | ~654 MB | ResNet50-based binary classifier trained on DFDC to detect real vs fake faces |
+| `best_unet_model.keras` | ~373 MB | Retinex-guided UNet encoder-decoder that enhances video frames before classification |
+
+---
+
+## Tech stack
+
+| Layer | Tools |
+|-------|-------|
 | Backend | Python, Flask |
 | Frontend | HTML, CSS, JavaScript |
-| Classification Model | ResNet50 (TensorFlow/Keras) |
-| Enhancement Model | UNet (TensorFlow/Keras) |
-| Face Detection | Dlib (HOG-based) |
+| Classification | ResNet50 (TensorFlow/Keras) |
+| Enhancement | UNet (TensorFlow/Keras) |
+| Face Detection | Dlib HOG |
 | Video Processing | OpenCV |
-| Fonts | Inter, Space Grotesk (Google Fonts) |
-| Icons | Font Awesome 6.4 |
 
-## 💻 System Requirements
+---
 
-| Component | Minimum | Recommended |
-|-----------|---------|-------------|
-| Python | 3.8+ | 3.10+ |
-| RAM | 8GB System RAM | 16GB+ System RAM |
-| GPU | Not required (CPU works) | NVIDIA GPU with CUDA |
-| Disk Space | 2GB (for models) | 4GB+ |
-| OS | Windows / Linux / Mac | Windows 10+ / Ubuntu 20.04+ |
-
-## 📁 Project Structure
+## Project structure
 
 ```
-webapptrial/
-├── app.py                          # Main Flask application (backend)
-├── README.md                       # Project documentation
-├── .gitignore                      # Git ignore rules
+truthsight-deepfake-detection/
+├── app.py                          # Flask backend
+├── README.md
+├── .gitignore
 │
-├── templates/                      # HTML templates
-│   ├── index.html                  # Landing page with upload form
-│   └── result.html                 # Analysis results page
+├── templates/
+│   ├── index.html                  # Upload page
+│   └── result.html                 # Results page
 │
-├── static/                         # Static assets
+├── static/
 │   └── css/
-│       └── style.css               # Stylesheet
+│       └── style.css
 │
-├── models/                         # Trained ML models (download separately)
-│   ├── deepfake-detection-model.h5 # ResNet50 classification model (~654MB)
-│   └── best_unet_model.keras       # UNet enhancement model (~373MB)
+├── models/                         # Download separately (see above)
+│   ├── deepfake-detection-model.h5
+│   └── best_unet_model.keras
 │
-├── codes/                          # Jupyter notebooks (training & experiments)
-│   ├── basicCode1.ipynb            # Basic deepfake detection code
-│   ├── createDataset.ipynb         # Dataset creation script
-│   ├── deepfake-Copy1.ipynb        # Main deepfake model training
-│   ├── enhancementModel.ipynb      # UNet enhancement model training
-│   ├── model_resnet50-Copy1.ipynb  # ResNet50 model training
-│   └── app.py                      # Backup of main app
+├── codes/                          # Training notebooks
+│   ├── deepfake-Copy1.ipynb
+│   ├── enhancementModel.ipynb
+│   ├── model_resnet50-Copy1.ipynb
+│   └── createDataset.ipynb
 │
-├── test_videos/                    # Sample test videos (not in repo)
-│   ├── fake1.mp4 - fake5.mp4      # Fake deepfake videos
-│   ├── real1.mp4 - real6.mp4      # Real authentic videos
-│   └── metadata.json              # Video metadata
-│
-└── uploads/                        # Temporary upload directory (auto-created)
+└── uploads/                        # Auto-created at runtime
 ```
 
-## 📦 Installation
+---
 
-### 1. Clone the Repository
+## Setup
+
+### 1. Clone
 
 ```bash
 git clone https://github.com/Axwathy/truthsight-deepfake-detection.git
 cd truthsight-deepfake-detection
 ```
 
-### 2. Install Dependencies
+### 2. Install dependencies
 
 ```bash
 pip install flask opencv-python dlib numpy tensorflow werkzeug
 ```
 
-> **Note:** Installing `dlib` on Windows may require [CMake](https://cmake.org/download/) and [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/). On Linux, you can install it with `pip install dlib` after installing `cmake` via your package manager.
+> **Windows note:** `dlib` needs Visual C++ Build Tools to compile. Install them from [here](https://visualstudio.microsoft.com/visual-cpp-build-tools/) and select "Desktop development with C++". Alternatively, grab a pre-built `.whl` from [this repo](https://github.com/z-mahmud22/Dlib_Windows_Python3.x) and install it directly.
 
-### 3. Download Model Files
+### 3. Download models
 
-The trained model files are too large for GitHub (>100MB each). Download them and place them in the `models/` folder:
+Grab both model files from the link above and drop them in the `models/` folder.
 
-> **📥 Model Download Link:** [Click here to download models](https://drive.google.com/drive/folders/1PLRYWGBN-fi8FlYnYEtZtqXmVvfbfB9o?usp=sharing)
-
-| Model File | Size | Description |
-|-----------|------|-------------|
-| `deepfake-detection-model.h5` | ~654 MB | ResNet50-based binary classifier trained on the DFDC dataset to detect real vs fake faces |
-| `best_unet_model.keras` | ~373 MB | Retinex-guided UNet encoder-decoder model used to enhance and sharpen video frames before classification |
-
-### 4. Run the Application
+### 4. Run
 
 ```bash
 python app.py
 ```
 
-The app will start at: **http://localhost:5000**
-
-Open your browser and navigate to `http://localhost:5000` to start detecting deepfakes!
-
-## 🔍 Model Details
-
-| Model | Architecture | Input Size | Purpose | Dataset |
-|-------|-------------|------------|---------|---------|
-| Classification | ResNet50 | 224×224 | Classify faces as Real/Fake | DFDC (Deepfake Detection Challenge) |
-| Enhancement | UNet (Encoder-Decoder) | 256×256 | Improve frame quality before analysis | Custom |
-| Face Detector | Dlib HOG | Variable | Detect and extract faces from frames | Built-in |
-
-### Detection Pipeline
-
-```
-Video Upload → Frame Extraction (1 fps) → UNet Enhancement → Dlib Face Detection → ResNet50 Classification → Majority Voting → Final Result
-```
-
-## 🎯 Use Cases
-
-- 📰 **Journalism** — Verify video authenticity before publishing
-- ⚖️ **Legal & Forensics** — Authenticate video evidence for court proceedings
-- 🏛️ **Government** — Protect against political misinformation
-- 🛡️ **Cybersecurity** — Detect social engineering attacks using synthetic media
-- 🎓 **Education** — Teach media literacy and content verification
-- 📱 **Social Media** — Identify and flag manipulated content
-- 🏦 **Financial Services** — Prevent identity fraud through video verification
-- 👤 **Personal Use** — Verify videos shared in personal networks
-
-## ❓ FAQ
-
-<details>
-<summary><b>What is a deepfake?</b></summary>
-<br>
-A deepfake is synthetic media created using artificial intelligence, typically involving the replacement of a person's face or voice in a video with someone else's likeness. The term combines "deep learning" and "fake."
-</details>
-
-<details>
-<summary><b>How accurate is the detection?</b></summary>
-<br>
-Our system achieves approximately 99.2% accuracy on standard deepfake datasets. However, detection accuracy can vary depending on video quality, compression, and the sophistication of the deepfake generation method.
-</details>
-
-<details>
-<summary><b>What video formats are supported?</b></summary>
-<br>
-We support MP4, AVI, MOV, MKV, and WEBM formats. The maximum file size is 500MB.
-</details>
-
-<details>
-<summary><b>Is my video data secure?</b></summary>
-<br>
-Yes. All videos are processed securely and automatically deleted immediately after analysis. We do not store, share, or use your videos for any purpose other than the requested analysis.
-</details>
-
-<details>
-<summary><b>What if no faces are detected?</b></summary>
-<br>
-Our deepfake detection specifically analyzes facial features. If no faces are detected in the video, we cannot provide a classification. Ensure your video contains clearly visible faces.
-</details>
-
-<details>
-<summary><b>How long does analysis take?</b></summary>
-<br>
-Most videos are processed within 30 seconds to 2 minutes depending on video length and resolution. The system samples one frame per second to balance speed and accuracy.
-</details>
-
-## 🏆 Credits
-
-This project was built by **Axwathy** — [GitHub Profile](https://github.com/Axwathy)
-
-### Technologies Used
-
-- [TensorFlow/Keras](https://www.tensorflow.org/) — Deep learning framework
-- [Flask](https://flask.palletsprojects.com/) — Python web framework
-- [OpenCV](https://opencv.org/) — Computer vision library
-- [Dlib](http://dlib.net/) — Face detection library
-- [Font Awesome](https://fontawesome.com/) — Icon library
-- [Google Fonts](https://fonts.google.com/) — Typography (Inter, Space Grotesk)
-
-## 📝 License
-
-This project is for educational and research purposes.
+Open `http://localhost:5000` in your browser.
 
 ---
 
-<div align="center">
+## System requirements
 
-### Protecting truth in the digital age with AI 🛡️
+| | Minimum | Recommended |
+|--|---------|-------------|
+| Python | 3.8+ | 3.10+ |
+| RAM | 8GB | 16GB+ |
+| GPU | Not required | NVIDIA with CUDA |
+| Disk | 2GB | 4GB+ |
+| OS | Windows / Linux / Mac | Windows 10+ / Ubuntu 20.04+ |
 
-### Last updated: June 2026
+---
 
-</div>
+## Limitations
+
+- Only works on videos with clearly visible faces — no faces means no result
+- Trained on a subset of DFDC, so very sophisticated or new deepfake methods might fool it
+- High-resolution videos take longer to process
+- No real-time video stream support yet
+
+---
+
+## What's next
+
+Things I want to add eventually:
+- Real-time stream detection
+- Grad-CAM visualization to show which facial regions triggered the detection
+- Audio + video multimodal analysis
+- Mobile/cloud deployment
+
+---
+
+## Built with
+
+- [TensorFlow/Keras](https://www.tensorflow.org/)
+- [Flask](https://flask.palletsprojects.com/)
+- [OpenCV](https://opencv.org/)
+- [Dlib](http://dlib.net/)
+
+---
+
+Built by **Axwathy** — [GitHub](https://github.com/Axwathy)
+
+*Last updated: June 2026*
